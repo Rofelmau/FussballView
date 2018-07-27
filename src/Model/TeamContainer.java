@@ -47,7 +47,7 @@ public class TeamContainer {
         return false;
     }
 
-    Team findTeamById(int teamId){
+    public Team findTeamById(int teamId){
         for (Team team: this.getTeamList()) {
             if (team.getTeamId() == teamId) {
                 return team;

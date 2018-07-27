@@ -46,12 +46,14 @@ public class NetworkConnection {
         return content.toString();
     }
 
+
     public JSONArray getResultAsJSONArray(URL url) throws Exception {
         return new JSONArray(getResult(url));
     }
 
-    public JsonElement getResultAsJSONElement(URL url) throws Exception{
 
+
+    public JsonElement getResultAsJSONElement(URL url) throws Exception{
 
         HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
         con.setRequestMethod("GET");
@@ -70,4 +72,6 @@ public class NetworkConnection {
         }
         return root;
     }
+
+    //https://www.openligadb.de/api/getmatchdata/bl1
 }

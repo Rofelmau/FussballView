@@ -8,9 +8,10 @@ import java.net.URL;
 import java.util.LinkedList;
 
 public enum League {
-    dfb2018("DFB Pokal","dfb2018","/2018"),
     bl1("1. Bundesliga","bl1","/2018"),
     bl2("2. Bundesliga","bl2","/2018"),
+    bl3("3. Bundesliga","bl3","/2018"),
+    dfb2018("DFB Pokal","dfb2018","/2018"),
     Lig("Ligue 1","Lig","/2018"),
     seriea("Seria A","seriea","/2017");
 
@@ -19,6 +20,8 @@ public enum League {
     private String shortCut;
     private String year;
     private LinkedList<TableEntry> table = new LinkedList<>();
+    private LinkedList<MatchDay> matchDays = new LinkedList<>();
+
 
     League(){
         LeagueContainer.getInstance().addLeague(this);
@@ -57,6 +60,7 @@ public enum League {
         URL url = new URL( "https://www.openligadb.de/api/getbltable/" + this.getShortCut() + this.getYear());
         JSONArray array = NetworkConnection.getInstance().getResultAsJSONArray(url);
         Gson mGson = new Gson();
+        table.clear();
         for(int i = 0; i < array.length(); i++){
             TableEntry tabEntry = mGson.fromJson(array.get(i).toString(), TableEntry.class);
             if(array.getJSONObject(i).getInt("TeamInfoId") != 175)
@@ -67,5 +71,29 @@ public enum League {
             this.table.add(tabEntry);
         }
 
+    }
+
+    public LinkedList<MatchDay> getMatchDays() {
+        return matchDays;
+    }
+
+    public void setMatchDays(LinkedList<MatchDay> matchDays) {
+        this.matchDays = matchDays;
+    }
+
+    public boolean matchDayExists(int matchDayID){
+        for(MatchDay mDay: this.getMatchDays()){
+            if(mDay.getMatchDay() == matchDayID)
+                return true;
+        }
+        return false;
+    }
+
+    public MatchDay getMatchDay(int matchdayId){
+        for(MatchDay mDay: this.getMatchDays()){
+            if(mDay.getMatchDay() == matchdayId)
+                return mDay;
+        }
+        return null;
     }
 }
