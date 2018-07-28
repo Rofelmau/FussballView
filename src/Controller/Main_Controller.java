@@ -41,8 +41,8 @@ public class Main_Controller implements Initializable, MainButtonDesign {
     }
 
     private void showLeague(League l) {
-        new LeagueTable_Controller(mainPane,l);
-        new MatchDay_Controller(mainPane,l);
+        LeagueTable_Controller.getInstance().start(mainPane,l);
+        MatchDay_Controller.getInstance().start(mainPane,l);
     }
 
 

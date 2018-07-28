@@ -26,6 +26,11 @@ class LeagueTable_Controller {
     private TableView<TableEntry> tableTableView;
     private AnchorPane mainPane;
     private ObservableList<TableEntry> tableViewElements = FXCollections.observableArrayList();
+    private static LeagueTable_Controller instance = new LeagueTable_Controller();
+
+    static LeagueTable_Controller getInstance(){
+        return instance;
+    }
 
     private void clearElements(AnchorPane pane){
         pane.getChildren().removeAll(nodes);
@@ -33,7 +38,7 @@ class LeagueTable_Controller {
         tableViewElements.clear();
     }
 
-     LeagueTable_Controller(AnchorPane mainPane, League l) {
+    void start(AnchorPane mainPane, League l){
         this.mainPane = mainPane;
         try {
             l.loadTable();
@@ -97,6 +102,10 @@ class LeagueTable_Controller {
         tableTableView.getSelectionModel().selectedItemProperty().addListener(
                 (observableValue, oldValue, newValue) -> changed()
         );
+    }
+
+    private LeagueTable_Controller() {
+
     }
 
     private void displayTeam(Team t){
