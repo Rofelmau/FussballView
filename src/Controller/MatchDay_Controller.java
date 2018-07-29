@@ -25,7 +25,7 @@ class MatchDay_Controller {
     private ObservableList<Match> tableViewElements = FXCollections.observableArrayList();
     private static MatchDay_Controller instance = new MatchDay_Controller();
 
-    public static MatchDay_Controller getInstance(){
+    static MatchDay_Controller getInstance(){
         return instance;
     }
 
@@ -37,7 +37,6 @@ class MatchDay_Controller {
         this.mainPane = pane;
         try{
             JSONArray result =  NetworkConnection.getInstance().getResultAsJSONArray(new URL("https://www.openligadb.de/api/getmatchdata/" + league.getShortCut()));
-            // Gson mGson = new Gson();
             int matchDayId = generateMatchDay(result, league);
             generateMatchDay(matchDayId+1,league);
             generateMatchDay(matchDayId-1,league);
@@ -48,22 +47,30 @@ class MatchDay_Controller {
     }
 
     private int generateMatchDay(JSONArray result, League league){
+        if(result.length() > 0) {
             int matchdayID = result.getJSONObject(0).getJSONObject("Group").getInt("GroupOrderID");
             MatchDay mDay = new MatchDay(matchdayID);
             for (int i = 0; i < result.length(); i++) {
-                // Match match = mGson.fromJson(result.get(i).toString(), Match.class);
                 JSONObject currentMatch = result.getJSONObject(i);
-                Match match = new Match(currentMatch.getInt("MatchID"), currentMatch.getBoolean("MatchIsFinished"), TeamContainer.getInstance().findTeamById(currentMatch.getJSONObject("Team1").getInt("TeamId")), TeamContainer.getInstance().findTeamById(currentMatch.getJSONObject("Team2").getInt("TeamId")));
+                int goalOne = 0;
+                int goalTwo = 0;
+                int resultLength = currentMatch.getJSONArray("MatchResults").length();
+                if(resultLength > 0){
+                    goalOne = currentMatch.getJSONArray("MatchResults").getJSONObject(resultLength-1).getInt("PointsTeam1");
+                    goalTwo = currentMatch.getJSONArray("MatchResults").getJSONObject(resultLength-1).getInt("PointsTeam2");
+
+                }
+                Match match = new Match(currentMatch.getInt("MatchID"), currentMatch.getBoolean("MatchIsFinished"), TeamContainer.getInstance().findTeamById(currentMatch.getJSONObject("Team1").getInt("TeamId")), TeamContainer.getInstance().findTeamById(currentMatch.getJSONObject("Team2").getInt("TeamId")),goalOne,goalTwo);
                 LinkedList<Match> matches = mDay.getMatches();
                 matches.add(match);
                 mDay.setMatches(matches);
-                //System.out.println(match.getTeamGuest().getTeamName());
-
             }
             LinkedList<MatchDay> matchDays = league.getMatchDays();
             matchDays.add(mDay);
             league.setMatchDays(matchDays);
             return matchdayID;
+        }else
+            return 0;
     }
 
     private void generateMatchDay(int matchDayID, League league){
@@ -89,7 +96,7 @@ class MatchDay_Controller {
 
         matchDayTableView = new TableView<>();
         matchDayTableView.setEditable(true);
-        matchDayTableView.setLayoutX(900);
+        matchDayTableView.setLayoutX(750);
         matchDayTableView.setLayoutY(130);
         matchDayTableView.setPrefWidth(350);
 
@@ -104,20 +111,33 @@ class MatchDay_Controller {
             imgv.setPreserveRatio(true);
             return new SimpleObjectProperty<>(imgv);
         }); */
-        TableColumn<Match, String> homeTeam = new TableColumn<>("");
+        TableColumn<Match, String> homeTeam = new TableColumn<>("Heim");
         homeTeam.setCellValueFactory( cell -> new SimpleStringProperty(cell.getValue().getTeamHome().getTeamName()));
-        TableColumn<Match, String> space = new TableColumn<>("");
-        space.setCellValueFactory( cell -> new SimpleStringProperty("  : "));
-        TableColumn<Match, String> guestTeam = new TableColumn<>("");
+        homeTeam.setMinWidth(158);
+        TableColumn<Match, String> result = new TableColumn<>("");
+        result.setCellValueFactory( cell ->{
+            result.setStyle("-fx-alignment: CENTER;");
+            if(cell.getValue().isFinished())
+                return new SimpleStringProperty("" + cell.getValue().getGoalTeam1() + ":" + cell.getValue().getGoalTeam2() + "");
+            else
+                return new SimpleStringProperty("time");
+        });
+
+        TableColumn<Match, String> guestTeam = new TableColumn<>("Gast");
         guestTeam.setCellValueFactory( cell -> new SimpleStringProperty(cell.getValue().getTeamGuest().getTeamName()));
+        guestTeam.setMinWidth(158);
+        guestTeam.setStyle("-fx-alignment: CENTER-RIGHT");
 
 
 
-        matchDayTableView.getColumns().addAll(homeTeam, space, guestTeam);
+        matchDayTableView.getColumns().addAll(homeTeam, result, guestTeam);
+        for(TableColumn c:matchDayTableView.getColumns()){
+            c.setSortable(false);
+        }
         matchDayTableView.setItems(tableViewElements);
 
         Text txt = new Text(matchDayId + ". Spieltag");
-        txt.setX(950);
+        txt.setX(800);
         txt.setY(120);
         nodes.add(txt);
         nodes.add(matchDayTableView);
@@ -125,7 +145,7 @@ class MatchDay_Controller {
 
         if(matchDayId > 1){
             Button btn = new Button("<--");
-            btn.setLayoutX(900);
+            btn.setLayoutX(750);
             btn.setLayoutY(100);
             btn.setOnAction(e -> {
                 displayMatchDay(matchDayId-1,league);
@@ -136,7 +156,7 @@ class MatchDay_Controller {
         }
         if(matchDayId < ((league.getTeamList().size()-1)*2)){
             Button btn = new Button("-->");
-            btn.setLayoutX(1050);
+            btn.setLayoutX(900);
             btn.setLayoutY(100);
             btn.setOnAction(e -> {
                 displayMatchDay(matchDayId+1,league);

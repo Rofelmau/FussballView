@@ -23,7 +23,10 @@ public class Main_Controller implements Initializable, MainButtonDesign {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Platform.runLater(()->{
-            for( League l:LeagueContainer.getInstance().getLeagueList()) {
+            //for( League l:LeagueContainer.getInstance().getLeagueList()) {
+             //   createButton(l);
+           // }
+            for( League l : League.values() ){
                 createButton(l);
             }
         });

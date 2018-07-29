@@ -56,19 +56,24 @@ public enum League {
         this.table = table;
     }
 
-    public void loadTable() throws Exception{
-        URL url = new URL( "https://www.openligadb.de/api/getbltable/" + this.getShortCut() + this.getYear());
-        JSONArray array = NetworkConnection.getInstance().getResultAsJSONArray(url);
-        Gson mGson = new Gson();
-        table.clear();
-        for(int i = 0; i < array.length(); i++){
-            TableEntry tabEntry = mGson.fromJson(array.get(i).toString(), TableEntry.class);
-            if(array.getJSONObject(i).getInt("TeamInfoId") != 175)
-                tabEntry.setTeam(TeamContainer.getInstance().findTeamById(array.getJSONObject(i).getInt("TeamInfoId")));
-            else
-                tabEntry.setTeam(TeamContainer.getInstance().findTeamById(123));
-            tabEntry.setPosition(i+1);
-            this.table.add(tabEntry);
+    public void loadTable() {
+        try {
+            URL url = new URL("https://www.openligadb.de/api/getbltable/" + this.getShortCut() + this.getYear());
+            JSONArray array = NetworkConnection.getInstance().getResultAsJSONArray(url);
+            Gson mGson = new Gson();
+            table.clear();
+            for (int i = 0; i < array.length(); i++) {
+                TableEntry tabEntry = mGson.fromJson(array.get(i).toString(), TableEntry.class);
+                if (array.getJSONObject(i).getInt("TeamInfoId") != 175)
+                    tabEntry.setTeam(TeamContainer.getInstance().findTeamById(array.getJSONObject(i).getInt("TeamInfoId")));
+                else
+                    tabEntry.setTeam(TeamContainer.getInstance().findTeamById(123));
+                tabEntry.setPosition(i + 1);
+                this.table.add(tabEntry);
+                //System.out.println(tabEntry.getPoints());
+            }
+        }catch(Exception e){
+            e.printStackTrace();
         }
 
     }

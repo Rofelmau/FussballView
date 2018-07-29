@@ -43,8 +43,6 @@ public class Main extends Application {
 
         primaryStage.show();
 
-
-        String baseURL = "https://www.openligadb.de/api/getavailableteams/";
     }
 
 

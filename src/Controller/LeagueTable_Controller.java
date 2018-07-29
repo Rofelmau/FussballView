@@ -4,6 +4,7 @@ import Model.League;
 import Model.TableEntry;
 import Model.Team;
 
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -16,13 +17,16 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+import javax.sound.sampled.Line;
 import java.util.LinkedList;
 
 class LeagueTable_Controller {
 
     private LinkedList<Node> nodes = new LinkedList<>();
+    private LinkedList<Node> teamNodes = new LinkedList<>();
     private TableView<TableEntry> tableTableView;
     private AnchorPane mainPane;
     private ObservableList<TableEntry> tableViewElements = FXCollections.observableArrayList();
@@ -35,12 +39,14 @@ class LeagueTable_Controller {
     private void clearElements(AnchorPane pane){
         pane.getChildren().removeAll(nodes);
         nodes.clear();
+        pane.getChildren().removeAll(teamNodes);
+        teamNodes.clear();
         tableViewElements.clear();
     }
 
     void start(AnchorPane mainPane, League l){
         this.mainPane = mainPane;
-        try {
+         try {
             l.loadTable();
         }catch(Exception e){
             e.printStackTrace();
@@ -61,7 +67,7 @@ class LeagueTable_Controller {
         tableTableView.setEditable(true);
         tableTableView.setLayoutX(300);
         tableTableView.setLayoutY(125);
-        tableTableView.setPrefWidth(500);
+        tableTableView.setPrefWidth(420);
 
 
         TableColumn<TableEntry, String> position = new TableColumn<>("");
@@ -76,21 +82,29 @@ class LeagueTable_Controller {
         });
         TableColumn<TableEntry, String> name = new TableColumn<>("Name");
         name.setCellValueFactory( cell -> new SimpleStringProperty(cell.getValue().getTeam().getTeamName()));
-        TableColumn<TableEntry, Integer> points = new TableColumn<>("Punkte");
-        points.setCellValueFactory(new PropertyValueFactory<>("points"));
-        TableColumn<TableEntry, Integer> win = new TableColumn<>("Siege");
-        points.setCellValueFactory(new PropertyValueFactory<>("won"));
-        TableColumn<TableEntry, Integer> draw = new TableColumn<>("Unentschieden");
-        points.setCellValueFactory(new PropertyValueFactory<>("draw"));
-        TableColumn<TableEntry, Integer> lost = new TableColumn<>("Verloren");
-        points.setCellValueFactory(new PropertyValueFactory<>("lost"));
-        TableColumn<TableEntry, Integer> goals = new TableColumn<>("Tore");
-        points.setCellValueFactory(new PropertyValueFactory<>("goals"));
-        TableColumn<TableEntry, Integer> opponentGoals = new TableColumn<>("Gegentore");
-        points.setCellValueFactory(new PropertyValueFactory<>("opponentGoals"));
+        TableColumn<TableEntry, String> points = new TableColumn<>("P");
+        points.setCellValueFactory( cell -> new SimpleStringProperty(cell.getValue().getPoints()+""));
+        TableColumn<TableEntry, String> win = new TableColumn<>("G");
+        win.setCellValueFactory(cell -> new SimpleStringProperty(""+cell.getValue().getWon()));
+        TableColumn<TableEntry, String> draw = new TableColumn<>("U");
+        draw.setCellValueFactory(cell -> new SimpleStringProperty(""+cell.getValue().getDraw()));
+        TableColumn<TableEntry, String> lost = new TableColumn<>("V");
+        lost.setCellValueFactory(cell -> new SimpleStringProperty(""+cell.getValue().getLost()));
+        TableColumn<TableEntry, String> goals = new TableColumn<>("Tore");
+        goals.setCellValueFactory(cell -> new SimpleStringProperty(""+cell.getValue().getGoals()+":"+cell.getValue().getOpponentGoals()));
+        TableColumn<TableEntry, String> dif = new TableColumn<>("Dif");
+        dif.setCellValueFactory(cell -> new SimpleStringProperty(""+(cell.getValue().getGoals()-cell.getValue().getOpponentGoals())));
+        goals.setStyle("-fx-alignment: CENTER");
+        points.setStyle("-fx-alignment: CENTER");
+        win.setStyle("-fx-alignment: CENTER");
+        draw.setStyle("-fx-alignment: CENTER");
+        lost.setStyle("-fx-alignment: CENTER");
+        dif.setStyle("-fx-alignment: CENTER");
 
-
-        tableTableView.getColumns().addAll(position, icon, name, points, win, draw, lost, goals, opponentGoals);
+        tableTableView.getColumns().addAll(position, icon, name, points, win, draw, lost, goals, dif);
+        for(TableColumn c: tableTableView.getColumns()){
+            c.setSortable(false);
+        }
         tableTableView.setItems(tableViewElements);
 
 
@@ -108,19 +122,29 @@ class LeagueTable_Controller {
 
     }
 
+
     private void displayTeam(Team t){
+        mainPane.getChildren().removeAll(teamNodes);
+        teamNodes.clear();
+
+        Text name = new Text(t.getTeamName());
+        name.setFont(Font.font ("Arial", 22));
+        name.setX(300);
+        name.setY(565);
+
         ImageView imgv = new ImageView(new Image(t.getTeamIconUrl(),100,100,true,true));
         imgv.setFitHeight(100);
         imgv.setFitHeight(100);
         imgv.setPreserveRatio(true);
-        imgv.setX(850);
-        imgv.setY(100);
+        imgv.setX(300);
+        imgv.setY(575);
 
-        Text name = new Text(t.getTeamName());
-        name.setX(1000);
-        name.setY(110);
+        //Line line1 = new Line(290, 0, 290, 400);
 
         mainPane.getChildren().addAll(imgv,name);
+        teamNodes.add(imgv);
+        teamNodes.add(name);
+
     }
 
     private void changed() {
