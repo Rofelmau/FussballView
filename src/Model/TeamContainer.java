@@ -29,11 +29,20 @@ public class TeamContainer {
         LinkedList<Team> teamList = new LinkedList<>();
         Gson mGson = new Gson();
         for(int i = 0; i < array.length(); i++){
+            Team t;
             if(!teamIsCreated(array.getJSONObject(i))) {
-                teamList.add(mGson.fromJson(array.get(i).toString(), Team.class));
+                t = mGson.fromJson(array.get(i).toString(), Team.class);
+
+                Runnable task = t::setIcon;
+                Thread thread = new Thread(task);
+                thread.setDaemon(true);
+                thread.start();
+
             }else{
-                teamList.add(findTeamById(array.getJSONObject(i).getInt("TeamId")));
+                t = findTeamById(array.getJSONObject(i).getInt("TeamId"));
             }
+            teamList.add(t);
+
         }
         return teamList;
     }

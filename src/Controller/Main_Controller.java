@@ -3,11 +3,13 @@ package Controller;
 import Model.League;
 import Model.LeagueContainer;
 import Utility.MainButtonDesign;
+import com.sun.prism.paint.Color;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.shape.Line;
 
 import java.net.URL;
 import java.util.LinkedList;
@@ -17,19 +19,26 @@ import java.util.ResourceBundle;
 public class Main_Controller implements Initializable, MainButtonDesign {
     @FXML
     private AnchorPane mainPane;
+    @FXML
+    private ScrollPane scrollPane;
     private LinkedList<Button> buttons = new LinkedList<>();
 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Platform.runLater(()->{
-            //for( League l:LeagueContainer.getInstance().getLeagueList()) {
-             //   createButton(l);
-           // }
+            scrollPane.setStyle("-fx-background-color: #FFFFFF");
+
             for( League l : League.values() ){
                 createButton(l);
             }
+
+            Line l1 = new Line(280,0,280,0);
+            l1.endYProperty().bind(scrollPane.getScene().heightProperty().multiply(2));
+            l1.setStrokeWidth(4);
+            mainPane.getChildren().add(l1);
         });
+
     }
 
 

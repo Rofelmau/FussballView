@@ -74,10 +74,14 @@ class LeagueTable_Controller {
         position.setCellValueFactory( cell -> new SimpleStringProperty(cell.getValue().getPosition()+""));
         TableColumn<TableEntry, ImageView> icon  = new TableColumn<>("");
         icon.setCellValueFactory(param -> {
-            ImageView imgv = new ImageView(new Image(param.getValue().getTeam().getTeamIconUrl(), 20, 20, true, true));
-            imgv.setFitHeight(20);
-            imgv.setFitWidth(20);
-            imgv.setPreserveRatio(true);
+            ImageView imgv = new ImageView();
+            if(!param.getValue().getTeam().getTeamIconUrl().isEmpty()) {
+                imgv.setImage(param.getValue().getTeam().getSmaleIcon());
+                imgv.setFitHeight(20);
+                imgv.setFitWidth(20);
+                imgv.setPreserveRatio(true);
+
+            }
             return new SimpleObjectProperty<>(imgv);
         });
         TableColumn<TableEntry, String> name = new TableColumn<>("Name");

@@ -2,6 +2,8 @@ package Controller;
 
 import Model.*;
 import Utility.NetworkConnection;
+import View.switchPageButtonDesign;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -9,6 +11,8 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 import org.json.JSONArray;
@@ -17,7 +21,7 @@ import org.json.JSONObject;
 import java.net.URL;
 import java.util.LinkedList;
 
-class MatchDay_Controller {
+class MatchDay_Controller implements switchPageButtonDesign {
 
     private LinkedList<Node> nodes = new LinkedList<>();
     private TableView<Match> matchDayTableView;
@@ -97,20 +101,25 @@ class MatchDay_Controller {
         matchDayTableView = new TableView<>();
         matchDayTableView.setEditable(true);
         matchDayTableView.setLayoutX(750);
-        matchDayTableView.setLayoutY(130);
-        matchDayTableView.setPrefWidth(350);
+        matchDayTableView.setLayoutY(125);
+        matchDayTableView.setPrefWidth(425);
 
 
-     /*   TableColumn<TableEntry, String> position = new TableColumn<>("");
-        position.setCellValueFactory( cell -> new SimpleStringProperty(cell.getValue().getPosition()+""));
-        TableColumn<TableEntry, ImageView> icon  = new TableColumn<>("");
-        icon.setCellValueFactory(param -> {
-            ImageView imgv = new ImageView(new Image(param.getValue().getTeam().getTeamIconUrl(), 20, 20, true, true));
-            imgv.setFitHeight(20);
-            imgv.setFitWidth(20);
-            imgv.setPreserveRatio(true);
+
+
+
+        TableColumn<Match, ImageView> iconTeamHome  = new TableColumn<>("");
+        iconTeamHome.setCellValueFactory(param -> {
+            ImageView imgv = new ImageView();
+            if(!param.getValue().getTeamHome().getTeamIconUrl().isEmpty()) {
+                imgv.setImage(param.getValue().getTeamHome().getSmaleIcon());
+                imgv.setFitHeight(20);
+                imgv.setFitWidth(20);
+                imgv.setPreserveRatio(true);
+
+            }
             return new SimpleObjectProperty<>(imgv);
-        }); */
+        });
         TableColumn<Match, String> homeTeam = new TableColumn<>("Heim");
         homeTeam.setCellValueFactory( cell -> new SimpleStringProperty(cell.getValue().getTeamHome().getTeamName()));
         homeTeam.setMinWidth(158);
@@ -127,10 +136,22 @@ class MatchDay_Controller {
         guestTeam.setCellValueFactory( cell -> new SimpleStringProperty(cell.getValue().getTeamGuest().getTeamName()));
         guestTeam.setMinWidth(158);
         guestTeam.setStyle("-fx-alignment: CENTER-RIGHT");
+        TableColumn<Match, ImageView> iconTeamGuest  = new TableColumn<>("");
+        iconTeamGuest.setCellValueFactory(param -> {
+            ImageView imgv = new ImageView();
+            if(!param.getValue().getTeamGuest().getTeamIconUrl().isEmpty()) {
+                imgv.setImage(param.getValue().getTeamGuest().getSmaleIcon());
+                imgv.setFitHeight(20);
+                imgv.setFitWidth(20);
+                imgv.setPreserveRatio(true);
+
+            }
+            return new SimpleObjectProperty<>(imgv);
+        });
 
 
 
-        matchDayTableView.getColumns().addAll(homeTeam, result, guestTeam);
+        matchDayTableView.getColumns().addAll(iconTeamHome, homeTeam, result, guestTeam, iconTeamGuest);
         for(TableColumn c:matchDayTableView.getColumns()){
             c.setSortable(false);
         }
@@ -151,6 +172,7 @@ class MatchDay_Controller {
                 displayMatchDay(matchDayId-1,league);
                 generateMatchDay(matchDayId-2,league);
             });
+            setDefaultDesign(btn);
             nodes.add(btn);
             mainPane.getChildren().add(btn);
         }
@@ -162,6 +184,7 @@ class MatchDay_Controller {
                 displayMatchDay(matchDayId+1,league);
                 generateMatchDay(matchDayId+2,league);
             });
+            setDefaultDesign(btn);
             nodes.add(btn);
             mainPane.getChildren().add(btn);
         }

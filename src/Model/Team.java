@@ -1,8 +1,7 @@
 package Model;
 
 import com.google.gson.annotations.SerializedName;
-
-import java.net.URL;
+import javafx.scene.image.Image;
 
 public class Team {
 
@@ -16,6 +15,12 @@ public class Team {
     private int TeamId;
     @SerializedName("TeamName")
     private String TeamName;
+
+    public Image getSmaleIcon() {
+        return smaleIcon;
+    }
+
+    private Image smaleIcon;
 
 
     public Team(){
@@ -54,11 +59,17 @@ public class Team {
         TeamName = teamName;
     }
 
-    public int getTeamId() {
+    int getTeamId() {
         return TeamId;
     }
 
     public void setTeamId(int teamId) {
         TeamId = teamId;
+    }
+    void setIcon(){
+        if (TeamIconUrl != null && !TeamIconUrl.isEmpty()) {
+            this.smaleIcon = new Image(this.getTeamIconUrl(), 20, 20, true, true);
+        }
+
     }
 }
