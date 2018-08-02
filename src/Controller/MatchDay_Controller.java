@@ -11,7 +11,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
@@ -19,6 +18,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 
 class MatchDay_Controller implements switchPageButtonDesign {
@@ -53,7 +54,8 @@ class MatchDay_Controller implements switchPageButtonDesign {
     private int generateMatchDay(JSONArray result, League league){
         if(result.length() > 0) {
             int matchdayID = result.getJSONObject(0).getJSONObject("Group").getInt("GroupOrderID");
-            MatchDay mDay = new MatchDay(matchdayID);
+            String matchdayName = result.getJSONObject(0).getJSONObject("Group").getString("GroupName");
+            MatchDay mDay = new MatchDay(matchdayID,matchdayName);
             for (int i = 0; i < result.length(); i++) {
                 JSONObject currentMatch = result.getJSONObject(i);
                 int goalOne = 0;
@@ -62,9 +64,9 @@ class MatchDay_Controller implements switchPageButtonDesign {
                 if(resultLength > 0){
                     goalOne = currentMatch.getJSONArray("MatchResults").getJSONObject(resultLength-1).getInt("PointsTeam1");
                     goalTwo = currentMatch.getJSONArray("MatchResults").getJSONObject(resultLength-1).getInt("PointsTeam2");
-
                 }
-                Match match = new Match(currentMatch.getInt("MatchID"), currentMatch.getBoolean("MatchIsFinished"), TeamContainer.getInstance().findTeamById(currentMatch.getJSONObject("Team1").getInt("TeamId")), TeamContainer.getInstance().findTeamById(currentMatch.getJSONObject("Team2").getInt("TeamId")),goalOne,goalTwo);
+                LocalDateTime datetime = LocalDateTime.parse(currentMatch.getString("MatchDateTime"), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                Match match = new Match(currentMatch.getInt("MatchID"), currentMatch.getBoolean("MatchIsFinished"), TeamContainer.getInstance().findTeamById(currentMatch.getJSONObject("Team1").getInt("TeamId")), TeamContainer.getInstance().findTeamById(currentMatch.getJSONObject("Team2").getInt("TeamId")),goalOne,goalTwo,datetime);
                 LinkedList<Match> matches = mDay.getMatches();
                 matches.add(match);
                 mDay.setMatches(matches);
@@ -89,6 +91,7 @@ class MatchDay_Controller implements switchPageButtonDesign {
     }
 
     private void displayMatchDay(int matchDayId, League league){
+        LocalDateTime currentTime = LocalDateTime.now();
         mainPane.getChildren().removeAll(nodes);
         nodes.clear();
         tableViewElements.clear();
@@ -102,12 +105,11 @@ class MatchDay_Controller implements switchPageButtonDesign {
         matchDayTableView.setEditable(true);
         matchDayTableView.setLayoutX(750);
         matchDayTableView.setLayoutY(125);
-        matchDayTableView.setPrefWidth(425);
+        matchDayTableView.setPrefWidth(500);
 
 
-
-
-
+        TableColumn<Match, String> matchDate  = new TableColumn<>("");
+        matchDate.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getDateOfMatch().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))));
         TableColumn<Match, ImageView> iconTeamHome  = new TableColumn<>("");
         iconTeamHome.setCellValueFactory(param -> {
             ImageView imgv = new ImageView();
@@ -126,10 +128,10 @@ class MatchDay_Controller implements switchPageButtonDesign {
         TableColumn<Match, String> result = new TableColumn<>("");
         result.setCellValueFactory( cell ->{
             result.setStyle("-fx-alignment: CENTER;");
-            if(cell.getValue().isFinished())
+            if(cell.getValue().getDateOfMatch().isBefore(currentTime))
                 return new SimpleStringProperty("" + cell.getValue().getGoalTeam1() + ":" + cell.getValue().getGoalTeam2() + "");
             else
-                return new SimpleStringProperty("time");
+                return new SimpleStringProperty(cell.getValue().getDateOfMatch().getHour() +":" + cell.getValue().getDateOfMatch().format(DateTimeFormatter.ofPattern("mm")));
         });
 
         TableColumn<Match, String> guestTeam = new TableColumn<>("Gast");
@@ -151,13 +153,14 @@ class MatchDay_Controller implements switchPageButtonDesign {
 
 
 
-        matchDayTableView.getColumns().addAll(iconTeamHome, homeTeam, result, guestTeam, iconTeamGuest);
+        matchDayTableView.getColumns().addAll(matchDate,iconTeamHome, homeTeam, result, guestTeam, iconTeamGuest);
         for(TableColumn c:matchDayTableView.getColumns()){
             c.setSortable(false);
         }
         matchDayTableView.setItems(tableViewElements);
 
-        Text txt = new Text(matchDayId + ". Spieltag");
+
+        Text txt = new Text(matchday.getName());
         txt.setX(800);
         txt.setY(120);
         nodes.add(txt);
@@ -176,13 +179,13 @@ class MatchDay_Controller implements switchPageButtonDesign {
             nodes.add(btn);
             mainPane.getChildren().add(btn);
         }
-        if(matchDayId < ((league.getTeamList().size()-1)*2)){
+        if(matchDayId < league.getNumberOfRounds() && league.getMatchDay(matchDayId+1) != null){
             Button btn = new Button("-->");
             btn.setLayoutX(900);
             btn.setLayoutY(100);
             btn.setOnAction(e -> {
-                displayMatchDay(matchDayId+1,league);
                 generateMatchDay(matchDayId+2,league);
+                displayMatchDay(matchDayId+1,league);
             });
             setDefaultDesign(btn);
             nodes.add(btn);

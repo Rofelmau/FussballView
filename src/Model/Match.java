@@ -1,5 +1,7 @@
 package Model;
 
+import java.time.LocalDateTime;
+
 public class Match {
     private int matchId;
     private boolean isFinished;
@@ -7,14 +9,16 @@ public class Match {
     private Team teamGuest;
     private int goalTeam1;
     private int goalTeam2;
+    private LocalDateTime dateOfMatch;
 
-    public Match(int matchId, boolean isFinished, Team teamHome, Team teamGuest, int goalOne, int goalTwo) {
+    public Match(int matchId, boolean isFinished, Team teamHome, Team teamGuest, int goalOne, int goalTwo, LocalDateTime dateOfMatch) {
         this.matchId = matchId;
         this.isFinished = isFinished;
         this.teamHome = teamHome;
         this.teamGuest = teamGuest;
         this.goalTeam1 = goalOne;
         this.goalTeam2 = goalTwo;
+        this.dateOfMatch = dateOfMatch;
     }
 
     public Team getTeamGuest() {
@@ -34,5 +38,9 @@ public class Match {
 
     public boolean isFinished() {
         return isFinished;
+    }
+
+    public LocalDateTime getDateOfMatch() {
+        return dateOfMatch;
     }
 }

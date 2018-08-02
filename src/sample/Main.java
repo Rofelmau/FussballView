@@ -29,6 +29,9 @@ public class Main extends Application {
             JSONArray jsonArray = NetworkConnection.getInstance().getResultAsJSONArray(url);
             LinkedList<Team> teams = TeamContainer.getInstance().generateTeams(jsonArray);
             l.setTeamList(teams);
+            url = new URL( "https://www.openligadb.de/api/getavailablegroups/" + l.getShortCut() + l.getYear());
+            jsonArray = NetworkConnection.getInstance().getResultAsJSONArray(url);
+            l.setNumberOfRounds(jsonArray.length());
         }
 
 

@@ -21,6 +21,7 @@ public enum League {
     private String year;
     private LinkedList<TableEntry> table = new LinkedList<>();
     private LinkedList<MatchDay> matchDays = new LinkedList<>();
+    private int numberOfRounds;
 
 
     League(){
@@ -100,5 +101,13 @@ public enum League {
                 return mDay;
         }
         return null;
+    }
+
+    public int getNumberOfRounds() {
+        return numberOfRounds;
+    }
+
+    public void setNumberOfRounds(int numberOfRounds) {
+        this.numberOfRounds = numberOfRounds;
     }
 }
