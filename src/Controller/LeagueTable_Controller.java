@@ -128,27 +128,7 @@ class LeagueTable_Controller {
 
 
     private void displayTeam(Team t){
-        mainPane.getChildren().removeAll(teamNodes);
-        teamNodes.clear();
-
-        Text name = new Text(t.getTeamName());
-        name.setFont(Font.font ("Arial", 22));
-        name.setX(300);
-        name.setY(565);
-
-        ImageView imgv = new ImageView(new Image(t.getTeamIconUrl(),100,100,true,true));
-        imgv.setFitHeight(100);
-        imgv.setFitHeight(100);
-        imgv.setPreserveRatio(true);
-        imgv.setX(300);
-        imgv.setY(575);
-
-        //Line line1 = new Line(290, 0, 290, 400);
-
-        mainPane.getChildren().addAll(imgv,name);
-        teamNodes.add(imgv);
-        teamNodes.add(name);
-
+        TeamView_Controller.getInstance().start(t,mainPane);
     }
 
     private void changed() {

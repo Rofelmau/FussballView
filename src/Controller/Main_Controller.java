@@ -32,10 +32,11 @@ public class Main_Controller implements Initializable, MainButtonDesign {
             for( League l : League.values() ){
                 createButton(l);
             }
-
-            Line l1 = new Line(280,0,280,0);
-            l1.endYProperty().bind(scrollPane.getScene().heightProperty().multiply(2));
+            mainPane.prefHeightProperty().bind(mainPane.getScene().getWindow().heightProperty());
+            Line l1 = new Line(280,0,280,700);
             l1.setStrokeWidth(4);
+            l1.endYProperty().bind(mainPane.heightProperty());
+            //scrollPane.hmaxProperty()
             mainPane.getChildren().add(l1);
         });
 

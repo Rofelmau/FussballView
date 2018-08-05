@@ -7,13 +7,11 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.text.Text;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -103,7 +101,7 @@ class MatchDay_Controller implements switchPageButtonDesign {
 
         matchDayTableView = new TableView<>();
         matchDayTableView.setEditable(true);
-        matchDayTableView.setLayoutX(750);
+        matchDayTableView.setLayoutX(850);
         matchDayTableView.setLayoutY(125);
         matchDayTableView.setPrefWidth(500);
 
@@ -160,16 +158,22 @@ class MatchDay_Controller implements switchPageButtonDesign {
         matchDayTableView.setItems(tableViewElements);
 
 
-        Text txt = new Text(matchday.getName());
-        txt.setX(800);
-        txt.setY(120);
-        nodes.add(txt);
+
+
+        TextField fText = new TextField();
+        fText.setText(matchday.getName());
+        fText.setAlignment(Pos.CENTER);
+        fText.setPrefWidth(100);
+        fText.setLayoutX(1050);
+        fText.setLayoutY(100);
+        fText.setEditable(false);
+        nodes.add(fText);
         nodes.add(matchDayTableView);
-        mainPane.getChildren().addAll(matchDayTableView,txt);
+        mainPane.getChildren().addAll(matchDayTableView,fText);
 
         if(matchDayId > 1){
             Button btn = new Button("<--");
-            btn.setLayoutX(750);
+            btn.setLayoutX(1020-btn.getWidth());
             btn.setLayoutY(100);
             btn.setOnAction(e -> {
                 displayMatchDay(matchDayId-1,league);
@@ -181,7 +185,7 @@ class MatchDay_Controller implements switchPageButtonDesign {
         }
         if(matchDayId < league.getNumberOfRounds() && league.getMatchDay(matchDayId+1) != null){
             Button btn = new Button("-->");
-            btn.setLayoutX(900);
+            btn.setLayoutX(1145);
             btn.setLayoutY(100);
             btn.setOnAction(e -> {
                 generateMatchDay(matchDayId+2,league);
